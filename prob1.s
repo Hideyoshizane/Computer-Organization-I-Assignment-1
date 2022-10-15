@@ -11,22 +11,23 @@ jal x1, inverte
 beq x0, x0, FIM
 ##### START MODIFIQUE AQUI START #####
 inverte:
-    beq x12, x13, final #Caso o endereço do começo do vetor < final do vetor
+    beq x12, x13, final #Caso o endereço do começo do vetor > final do vetor
 
     #recebe os valores iniciais
-    lw x5, 0(x12) 
-    lw x6, 0(x13)
+    lw x6, 0(x12) 
+    lw x7, 0(x13)
 
     #inverte os locais
-    sw x5, 0(x13)
-    sw x6, 0(x12)
+    sw x6, 0(x13)
+    sw x7, 0(x12)
 
     #incrementa os valores
     addi x12, x12, 4
     addi x13, x13, -4
 
-    jal x5, inverte
+    jal x0, inverte
     final:
+    addi x10, x0, 1 #Caso chegue ao final, retorne 1
     jalr x0, 0(x1)
 ##### END MODIFIQUE AQUI END #####
 FIM: add x1, x0, x10

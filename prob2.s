@@ -1,5 +1,5 @@
 .data 
-vetor:.word 1 1 4 4 4 7 7 7 0 0 0 1 6 1
+vetor:.word 3 6 7 8 5 7 4 3 1 9 2
 ##### START MODIFIQUE AQUI START #####
 vecPJ: .word 6 5 4 3 2 9 8 7 6 5 4 3 2
 vecCPF: .word 11 10 9 8 7 6 5 4 3 2 
@@ -7,18 +7,18 @@ vecCPF: .word 11 10 9 8 7 6 5 4 3 2
 .text 
 
 main: 
-    la x12, vetor 
+    la   x12, vetor 
     addi x13, x0, 11
     addi x14, x0, 0 
-    jal x1, verificadastro 
-    beq x0,x0,FIM
+    jal  x1, verificadastro 
+    beq  x0,x0,FIM
 
 ##### START MODIFIQUE AQUI START #####
 verificadastro:
-    addi x6, x0, -1 	 	  #recebe resultado final se é válido ou não o CPF/CNPJ 
-    addi x3, x0, 1 			  #insere se é CPF ou CNJP
+    addi x10, x0, -1 	 	    #Recebe resultado final se é válido ou não o CPF/CNPJ 
+    addi x17, x0, 0 			#Insere se é CPF ou CNJP
 
-    bne x3, x0 cnpj		 	  #Pular para cnpj caso x3 != 0
+    bne x17, x0 cnpj		 	#Pular para cnpj caso x17 != 0
     jal x1, verificacpf
     beq x0,x0,FIM
 
@@ -29,162 +29,164 @@ cnpj:
 ######################################################
 verificacpf:
 #Parte do CPF
-#x12 = vetor principal
-#x9  = vetor CPF
-#x11 = condicional de looping
-#x14 = condicional de looping
-#x8  = valores temporários
-#x13 = valores temporários
-#x5  = endereço de retorno das subfunções
-#x1  = endereço de retorno verificacadastro
+#x12 = Vetor principal
+#x7  = Vetor CPF
+#x6  = Valor temporário
+#x28 = Condicional de looping
+#x29 = Condicional de looping
+#x30 = Valor temporário
+#x31 = Valor temporário
+#x5  = Endereço de retorno das subfunções
+#x1  = Endereço de retorno verificacadastro
 ######################################################
 ###### Parte que chama as sub funções  ###############
-    la x9, vecCPF
+    la   x7, vecCPF
     #Prepara para o looping de multiplicação.
     addi sp, sp, -36 
-    addi x9, x9,  4     	  #Pula para vecCPF[1] para o valor inicial ser 10 e não 11.
-    addi x11, x0, 9     	  #variavel de condição final do loop.
-    jal x5, LoopMultiplica
+    addi x7, x7,  4     	    #Pula para vecCPF[1] para o valor inicial ser 10 e não 11.
+    addi x28, x0, 9     	    #variavel de condição final do loop.
+    jal  x5, LoopMultiplica
 
     #Prepara para o looping de soma
-    addi sp, sp, -44 		  #reseta a pilha
-    add x11, x0, x0  		  #reseta o registrador de looping
-    add x13, x0, x0
-    addi x14, x0, 9  		  #variável de final de loop
-    addi x12, x12, -8 		  #Correção no valor do vetor
-    jal x5, SomaPilha
-    jal x5, Multiplicacao
+    addi sp, sp, -44 		    #Reseta a pilha
+    add  x28, x0, x0  		    #Reseta o registrador de looping
+    add  x31, x0, x0
+    addi x29, x0, 9  		    #Variável de final de loop
+    addi x12, x12, -8 		    #Correção no valor do vetor
+    jal  x5, SomaPilha
+    jal  x5, Multiplicacao
 
     #Prepara para o looping de multiplicação do segundo dígito
-    addi sp, sp, -36 	      #reseta pilha
-    addi x12, x12, -36  	  #reseta vetor com dados
-    addi x9, x9, -48    	  #reseta vetor de multiplicação, agora pro 1 valor
-    addi x11, x0,  10    	  #variavel de condição final do loop
-    jal x5, LoopMultiplica
+    addi sp, sp, -36 	        #Reseta pilha
+    addi x12, x12, -36  	    #Reseta vetor com dados
+    addi x7, x7, -48    	    #Reseta vetor de multiplicação, agora pro 1 valor
+    addi x28, x0,  10    	    #Variavel de condição final do loop
+    jal  x5, LoopMultiplica
     #Prepara para o looping de soma
-    addi sp, sp, -48    	  #reseta a pilha
-    add x11, x0, x0 		  #reseta o registrador de looping
-    add x13, x0, x0
-    addi x14, x0, 10  		  #variável de final de loop
-    addi x12, x12, -8 		  #Correção no valor do vetor
-    jal x5, SomaPilha
-    jal x5, Multiplicacao
-    jal x0, Valido      	  #Caso chegue aqui, todos os passos indicam que é válido o CPF
+    addi sp, sp, -48    	    #Reseta a pilha
+    add  x28, x0, x0 		    #Reseta o registrador de looping
+    add  x31, x0, x0
+    addi x29, x0, 10  		    #Variável de final de loop
+    addi x12, x12, -8 		    #Correção no valor do vetor
+    jal  x5, SomaPilha
+    jal  x5, Multiplicacao
+    jal  x0, Valido      	    #Caso chegue aqui, todos os passos indicam que é válido o CPF
     
 ######################################################
 ### Sub funções do CPF, algumas são usadas no CNPJ ###
 
-    LoopMultiplica:			  #Multiplica os vetores e guarda na pilha
-        lw  x8, 0(x12)    	  #pega o digito
-        lw x10, 0(x9)     	  #pega o multiplicador do segundo vetor
-        mul x8, x8, x10  
-        sw  x8, 0(sp)    	  #guarda na pilha
-        addi x9, x9, 4   	  #aumenta no vetor auxiliar
-        addi x12, x12, 4 	  #aumenta no vetor
-        addi sp, sp, 4   	  #aumenta na pilha
-        bge x11, x0 , LoopMultiplicaPJ
+    LoopMultiplica:			    #Multiplica os vetores e guarda na pilha
+        lw   x30, 0(x12)        #Pega o digito
+        lw   x6, 0(x7)     	    #Pega o multiplicador do segundo vetor
+        mul  x30, x30, x6  
+        sw   x30, 0(sp)    	    #Guarda na pilha
+        addi x7, x7, 4   	    #Aumenta no vetor auxiliar
+        addi x12, x12, 4 	    #Aumenta no vetor
+        addi sp, sp, 4   	    #Aumenta na pilha
+        bge  x28, x0 , LoopMultiplicaPJ
         jalr x0, 0(x5)
 
-    SomaPilha:           	  #Soma o total da pilha pra ser usado em seguida
-        lw x8, 0(sp)     	  #busca valor na pilha
-        add x13, x13, x8 	  #adiciona o somatório no final
-        addi sp, sp, 4   	  #aumenta a pilha
-        addi, x11, x11, 1
-        blt x11, x14, SomaPilha
+    SomaPilha:           	    #Soma o total da pilha pra ser usado em seguida
+        lw   x30, 0(sp)         #Busca valor na pilha
+        add  x31, x31, x30 	    #Adiciona o somatório no final
+        addi sp, sp, 4   	    #Aumenta a pilha
+        addi x28, x28, 1
+        blt  x28, x29, SomaPilha
         jalr x0, 0(x5)
 
-    Multiplicacao:            #Multiplica e acha resto para validar o dígito
-        addi x8, x0, 10
-        mul x13, x13, x8 	  #Soma * 10 
-        addi x8, x0, 11
-        rem x13, x13, x8 	  #Soma % 11
-        addi x8, x0, 10
-        bne x13, x8, Resto    #pula linha de transformação caso resto != 10
-        add x13, x0, x0       #transforma em 0 caso resto == 10
+    Multiplicacao:              #Multiplica e acha resto para validar o dígito
+        addi x30, x0, 10
+        mul  x31, x31, x30 	    #Soma * 10 
+        addi x30, x0, 11
+        rem  x31, x31, x30 	    #Soma % 11
+        addi x30, x0, 10
+        bne  x31, x30, Resto    #Pula linha de transformação caso resto != 10
+        add  x31, x0, x0        #Transforma em 0 caso resto == 10
         Resto:
-        lw x8, 0(x12)
-        bne x13, x8, Invalido #Caso resto != digito levar ao processo final que finaliza a função
+        lw   x30, 0(x12)
+        bne  x31, x30, Invalido #Caso resto != digito levar ao processo final que finaliza a função
         jalr x0, 0(x5)
 
     Valido:
-        addi x6, x0, 1
+        addi x10, x0, 1
         jalr x0, 0(x1)
 
     Invalido:
-        addi x6, x0, 0
+        addi x10, x0, 0
         jalr x0, 0(x1)
 
 ######################################################
 verificacnpj:
 #Parte do CNPJ
 #x12 = vetor principal
-#x9  = vetor CPF
-#x11 = condicional de looping
-#x14 = condicional de looping
-#x8  = valores temporários
-#x13 = valores temporários
+#x7  = vetor CNPJ
+#x6  = valor temporário
+#x28 = condicional de looping
+#x29 = condicional de looping
+#x30 = valores temporários
+#x31 = valores temporários
 #x5  = endereço de retorno das subfunções
 #x1  = endereço de retorno verificacadastro
 ###################################################### 
-    la x9, vecPJ
+    la x7, vecPJ
     #Prepara para o looping de multiplicação.
     addi sp, sp, -48
-    addi x9, x9, 4 				#pula pra a[1] no vetor de multiplicação
-    addi x11, x0, 11 			#variavel de condição final do loop
-    jal x5, LoopMultiplicaPJ
+    addi x7, x7, 4 				#Pula pra a[1] no vetor de multiplicação
+    addi x28, x0, 11 			#Variavel de condição final do loop
+    jal  x5, LoopMultiplicaPJ
     
     #Prepara para o looping de soma
     addi sp, sp, -48
-    add x11, x0, x0  			#reseta o registrador de looping
-    add x13, x0, x0
-    addi x14, x0, 12  			#variável de final de loop
-    jal x5, SomaPilha   		#Mesma função utilizado no CPF
-    jal x5, MultiplicacaoPJ
+    add  x28, x0, x0  			#Reseta o registrador de looping
+    add  x31, x0, x0
+    addi x29, x0, 12  			#Variável de final de loop
+    jal  x5, SomaPilha   		#Mesma função utilizado no CPF
+    jal  x5, MultiplicacaoPJ
     #Prepara para o looping de multiplicação do segundo dígito
     addi sp, sp, -48
-    addi x12, x12, -48 			#reseta vetor com dados
-    addi x9, x9, -52    		#reseta vetor de multiplicação, agora pro 1 valor
-    addi x11, x0,  13    		#variavel de condição final do loop
-  	jal x5, LoopMultiplicaPJ
+    addi x12, x12, -48 			#Reseta vetor com dados
+    addi x7, x7, -52    		#Reseta vetor de multiplicação, agora pro 1 valor
+    addi x28, x0,  13    		#Variavel de condição final do loop
+  	jal  x5, LoopMultiplicaPJ
 	#Prepara para o looping de soma do segundo dígito
     addi sp, sp, -56
-    add x11, x0, x0  			#reseta o registrador de looping
-    add x13, x0, x0
-    addi x14, x0, 13  			#variável de final de loop
-    jal x5, SomaPilha   		#Mesma função utilizado no CPF
+    add  x28, x0, x0  			#Reseta o registrador de looping
+    add  x31, x0, x0
+    addi x29, x0, 13  			#Variável de final de loop
+    jal  x5, SomaPilha   		#Mesma função utilizado no CPF
     addi x12, x12, -4
-    jal x5, MultiplicacaoPJ
-    jal x0, Valido      		#Caso chegue aqui, todos os passos indicam que é válido o CNPJ #Mesmo do CPF
+    jal  x5, MultiplicacaoPJ
+    jal  x0, Valido      		#Caso chegue aqui, todos os passos indicam que é válido o CNPJ #Mesmo do CPF
 
 
 ######################################################
 ############### Sub funções do CNPJ  #################
     LoopMultiplicaPJ:
-        lw  x8, 0(x12)  		#pega o valor
-        lw  x10, 0(x9) 			#pega o multiplicador
-        mul x8, x8, x10
-        sw  x8, 0(sp)
-        addi x12, x12, 4 		#aumenta no vetor
-        addi x9, x9, 4 			#aumenta no vetor multiplicador
-        addi sp, sp, 4  		#aumenta na pilha
-        addi x11, x11, -1
-        bge x11, x0 , LoopMultiplicaPJ
+        lw   x30, 0(x12)  		#Pega o valor
+        lw   x6, 0(x7) 			#Pega o multiplicador
+        mul  x30, x30, x6
+        sw   x30, 0(sp)
+        addi x12, x12, 4 		#Aumenta no vetor
+        addi x7, x7, 4 			#Aumenta no vetor multiplicador
+        addi sp, sp, 4  		#Aumenta na pilha
+        addi x28, x28, -1
+        bge  x28, x0 , LoopMultiplicaPJ
     	jalr x0, 0(x5)
         
         
      MultiplicacaoPJ:            #Multiplica e acha resto para validar o dígito
-        addi x8, x0, 11
-        rem x13, x13, x8 	     #Soma % 11
-        addi x8, x0, 2
-        bge x13, x8 , RestoPJ
-        add x13, x0, x0       	 #trasforma em 0 caso resto < 2
-        jal x0, PJTeste       	 #pula a subtração caso o dígito seja 0
+        addi x30, x0, 11
+        rem  x31, x31, x30 	     #Soma % 11
+        addi x30, x0, 2
+        bge  x31, x30 , RestoPJ
+        add  x31, x0, x0       	 #Trasforma em 0 caso resto < 2
+        jal  x0, PJTeste       	 #Pula a subtração caso o dígito seja 0
         RestoPJ:
-        addi x8, x0, 11
-        sub  x13, x8, x13	     # 11 - Resto
-        lw x8, 0(x12)			 #Recebe dígito verificador
+        addi x30, x0, 11
+        sub  x31, x30, x31	     # 11 - Resto
+        lw   x30, 0(x12)		 #Recebe dígito verificador
         PJTeste:
-        bne x13, x8, Invalido 	 #Caso resto != digito levar ao processo final que finaliza a função #Mesmo inválido do CPF
+        bne  x31, x30, Invalido  #Caso resto != digito levar ao processo final que finaliza a função #Mesmo inválido do CPF
         jalr x0, 0(x5)
     
 
