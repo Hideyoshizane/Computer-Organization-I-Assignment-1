@@ -135,7 +135,7 @@ verificacnpj:
     la x7, vecPJ
     #Prepara para o looping de multiplicação.
     addi sp,  sp, -48
-    addi x7,  x7,  4			#Pula pra a[1] no vetor de multiplicação
+    addi x7,  x7,  4			#Pula para vecPJ[1] para o valor inicial ser 5 e não 6.
     addi x28, x0,  11 			#Variavel de condição final do loop
     jal  x5,  LoopMultiplica
     
@@ -149,7 +149,7 @@ verificacnpj:
     #Prepara para o looping de multiplicação do segundo dígito
     addi sp,  sp,  -48
     addi x12, x12, -48 			#Reseta vetor com dados
-    addi x7,  x7,  -52    		#Reseta vetor de multiplicação, agora pro 1 valor
+    addi x7,  x7,  -52    		#Reseta vetor de multiplicação, agora para vecPJ[0]
     addi x28, x0,   13    		#Variavel de condição final do loop
   	jal  x5,  LoopMultiplica
 	#Prepara para o looping de soma do segundo dígito
