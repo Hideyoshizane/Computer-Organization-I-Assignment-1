@@ -6,7 +6,7 @@ main:
 la   a0, cardnumber
 jal  ra, verify
 beq  zero,zero,END
-##### START MODIFIQUE AQUI START #####
+####################################################
 #x31 = get vector value
 #x30 = loop counter
 #x29 = comparison variable
@@ -65,7 +65,7 @@ multiplyvectors:
 #a1  = return
 #Na pilha:
 # -4(sp) verify function return address
-# -64(sp) pra -8(sp) multiplication vector results
+# -64(sp) to -8(sp) multiplication vector results
 ####################################################
 li   x30,  15
 li   a1,   0
